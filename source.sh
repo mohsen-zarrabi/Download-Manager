@@ -64,9 +64,6 @@ function getLinks {
 				;;
 				5) return
 				;;
-				
-				*) echo "Are you sick? :)"
-				;;
 			esac
 		clear
 		printf "*********************************************************\n"
@@ -97,7 +94,7 @@ if [[ $1 != "start" ]];then
 			if [[ $ch != 'y' ]]; then echo exit ; exit ; fi
 			break
 		else
-			printf "have a nice day :)\n"
+			printf "have a nice day ;)\n"
 			exit
 		fi
 	done
