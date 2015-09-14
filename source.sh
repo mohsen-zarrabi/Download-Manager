@@ -42,7 +42,7 @@ function getLinks {
 				2)	
 					#http - https - ftp
 					clear	# clear screen
-					printf "Info:\tType the require options like it \"http|https|ftp://username:password@proxy:PORT\"\n"
+					printf "Info:\tExample: \"http|https|ftp://username:password@proxy:PORT\"\n"
 					printf "Warn:\tPassword will be save as clear text\n"
 					printf "type: "
 						read proxy
