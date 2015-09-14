@@ -13,7 +13,7 @@ function getLinks {
 	num=0
 	printf "Type the link: "
 		read link
-	printf "Type path(current path is default): "
+	printf "Type path(The current directory is default): "
 		read path
 	if [[ $path == "" ]];then path=$crntDir ; fi
 	
@@ -40,7 +40,6 @@ function getLinks {
 						read password
 				;;
 				2)	
-					#http - https - ftp
 					clear	# clear screen
 					printf "Info:\tExample: \"http|https|ftp://username:password@proxy:PORT\"\n"
 					printf "Warn:\tPassword will be save as clear text\n"
@@ -52,10 +51,10 @@ function getLinks {
 				;;
 				4)
 					#counter=0
-					counter=$(cat $crntDir/links.txt 2>$crntDir/error.txt | wc -l)
+					counter=$(cat $crntDir/links.txt 2>>$crntDir/error.txt | wc -l)
 					((counter++))
 					echo "$counter $link $path" >> $crntDir/links.txt
-					if [[ ( $username -ne "" && $password -ne "" ) || $setTorrent -ne "NULL" ]];then
+					if [[ ( $username -ne "@@" && $password -ne "@@" ) || $setTorrent -ne "NULL" ]];then
 						printf "$counter $username\t$password\t$setTorrent\n" >> $crntDir/req.txt
 					fi
 					if [[ $proxy -ne "" ]]; then
@@ -81,6 +80,7 @@ function getLinks {
 
 }
 
+
 if [[ $1 != "start" ]];then
 	
 	while true; do
@@ -89,15 +89,15 @@ if [[ $1 != "start" ]];then
 			read ch
 
 		if [[ $ch == 'y' || $ch == "" ]];then
-			getLinks
-			clear
+			getLinks	# getLinks is a function
+			clear		# clear the screen
 		elif [[ $ch == 'n' ]];then
 			printf "Do you want to start download?(y / n=exit) "
 				read ch
 			if [[ $ch != 'y' ]]; then echo exit ; exit ; fi
 			break
 		else
-			printf "Are you crazy? :)\n"
+			printf "have a nice day :)\n"
 			exit
 		fi
 	done
@@ -113,8 +113,8 @@ while read link; do
 	path=$(echo $link | awk '{print $3}')	# get path of download
 	link=$(echo $link | awk '{print $2}')	# set link to be download
 
-	info=$(cat $crntDir/req.txt 2>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch requirment information like usernname,passowrd,... from req.txt
-	proxy=$(cat $crntDir/prx.txt 2>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch proxy informations from prx.txt file.
+	info=$(cat $crntDir/req.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch requirment information like usernname,passowrd,... from req.txt
+	proxy=$(cat $crntDir/prx.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch proxy informations from prx.txt file.
 	
 	if [[ $info != "" ]];then
 		username=$(echo $info | awk '{print $2}')
@@ -125,13 +125,13 @@ while read link; do
 	if [[ $username != "@@" && $passowrd != "@@" ]]; then	options="--http-user=$username  --http-passwd=$password" ; fi
 	if [[ $proxy != "" && $options -eq " " ]]; then	options="$proxy"  ; fi
 	if [[ $torrent -ne "NULL" ]]; then	options="$options  --seed-time=0" ; fi
-
+	
 	
 	aria2c -x16 -s16 -k 1M  $options -d "${path}" --log-level=notice -l dllog "${link}"
 	
 	# delete link and it's options from files if download was successfull.
 	if [[ $? == 0 ]];then
-		sed -r -i "/^$counter/d" "$crntDir/links.txt" "$crntDir/req.txt"  "$crntDir/prx.txt"  2>$crntDir/error.txt
+		sed -r -i "/^$counter/d" "$crntDir/links.txt" "$crntDir/req.txt"  "$crntDir/prx.txt"  2>>$crntDir/error.txt
 	fi
 	
-done < links.txt	# links.txt contains links should be download.
+done < links.txt	# links.txt contains that links should be download.
