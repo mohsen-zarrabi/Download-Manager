@@ -3,9 +3,9 @@
 # Auther: M3
 
 crntDir=$(pwd)	# save important files in this directory. you can change it for yourself.
-path=$crntDir
-username="@@"
-password="@@"
+path=$crntDir	# save files that will be download in this direcory. default is current directory, you can change it durring the start program.
+username="@@"	# you cant have @@ username
+password="@@"	# you cant have @@ password
 proxy=""
 setTorrent="NULL"
 
@@ -78,7 +78,7 @@ function getLinks {
 }
 
 
-if [[ $1 != "start" ]];then
+if [[ $1 != "start" ]];then	# you can start downloading with give "start" arguman to execute program. like "./idm.sh start"
 	
 	while true; do
 		ch=""
@@ -92,7 +92,7 @@ if [[ $1 != "start" ]];then
 			printf "Do you want to start download?(y / n=exit) "
 				read ch
 			if [[ $ch != 'y' ]]; then echo exit ; exit ; fi
-			break
+			break	# Anything except 'n' or 'y' cause to close the program.
 		else
 			printf "have a nice day ;)\n"
 			exit
