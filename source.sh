@@ -95,6 +95,7 @@ if [[ $1 != "start" ]];then
 			printf "Do you want to start download?(y / n=exit) "
 				read ch
 			if [[ $ch != 'y' ]]; then echo exit ; exit ; fi
+			break
 		else
 			printf "Are you crazy? :)\n"
 			exit
