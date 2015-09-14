@@ -1,5 +1,5 @@
 # This is an internet download manager that release with gnu public licence.
-# you can redistribue it for your self.
+# you can redistribute it for your self.
 # Auther: M3
 
 crntDir=$(pwd)	# save important files in this directory. you can change it for yourself.
