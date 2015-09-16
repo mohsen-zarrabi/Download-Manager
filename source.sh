@@ -51,7 +51,7 @@ function getLinks {
 				;;
 				4)
 					#counter=0
-					counter=$(cat $crntDir/links.txt 2>>$crntDir/error.txt | wc -l)
+					counter=$(cat $crntDir/links.txt 2>>$crntDir/error.txt | tail -1 | awk '{print $1}')	# fixed
 					((counter++))
 					echo "$counter $link $path" >> $crntDir/links.txt
 					if [[ ( $username -ne "@@" && $password -ne "@@" ) || $setTorrent -ne "NULL" ]];then
