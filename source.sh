@@ -3,13 +3,13 @@
 # Auther: M3
 
 #*************************************START******************************************
-crntDir=$(pwd)	# save important files in this directory. you can change it for yourself.
-path=$crntDir	# save files that will be download in this direcory. default is current directory, you can change it durring the start program.
-username="@@"	# you cant have @@ username
-password="@@"	# you cant have @@ password
+crntDir=$(pwd)	# save important files(links.txt,dllog,error.txt,...) in this directory. you can change it for yourself.
+path=$crntDir	# save downloaded link in this direcory. default is current directory, you can change it durring the start program.
+username="@@"	# you can't have @@ username
+password="@@"	# you can't have @@ password
 proxy=""
-setTorrent="T_NULL"
-setYoutube="Y_NULL"
+setTorrent="T_NULL"	# default initialization
+setYoutube="Y_NULL"	# default initialization
 #setFtp="F_NULL"
 #*************************************FINISH******************************************
 
@@ -126,13 +126,13 @@ function checkNet {
 			echo "$counter tries to connect to internet but failed" >> $crntDir/error.txt
 			if [[ $counter == 10 ]];then
 				echo "the connection is failed..." >> dllog
-				exit
+				exit	# exit the program and stop downloads.
 			fi
 			
 			let stime=$stime+30
-			$(nmcli nm wifi off)
+			$(nmcli nm wifi off)	# this may be different on your system
 			sleep $stime
-			$(nmcli nm wifi on)
+			$(nmcli nm wifi on)	# this may be different on your system
 			sleep 20
 		else
 			return
