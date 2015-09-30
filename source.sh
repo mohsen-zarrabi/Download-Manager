@@ -7,7 +7,7 @@
 #*********************************START Initialization*******************************
 # Initialization
 
-crntDir="/home/mohsen/Downloads/down"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
+crntDir="/path/to/download/files/"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.
 path=$crntDir	# default path to save downloads. you can save optional link in diffrent path to douring the program.
 username="@@"	# default username, you don not have @@ as real username
 password="@@"	# default passowrd, you do not have @@ as real password
@@ -22,7 +22,7 @@ function getLinks {
 	printf "Type the link: "
 		read link
 	link=$(echo "$link" | sed  's/ /\\ /g')
-	link="#$link#"		# fixed. we used '#' to determind the begin and end of the links. because may be the link contain space and program can not fetch links from file correctly.
+	link="#$link#"		# we used '#' to determind the begin and end of the links. because may be the link contain space and program can not fetch links from file correctly.
 	
 	printf "Type path(The current directory is default): "
 		read path
