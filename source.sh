@@ -1,23 +1,29 @@
+#!/bin/bash
+
 # This is an internet download manager that release with gnu public licence.
 # you can redistribute it for your self.
 # Auther: M3
 
-#*************************************START******************************************
-crntDir=$(pwd)	# save important files(links.txt,dllog,error.txt,...) in this directory. you can change it for yourself.
-path=$crntDir	# save downloaded link in this direcory. default is current directory, you can change it durring the start program.
-username="@@"	# you can't have @@ username
-password="@@"	# you can't have @@ password
+#*********************************START Initialization*******************************
+# Initialization
+
+crntDir="/home/mohsen/Downloads/down"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
+path=$crntDir	# default path to save downloads. you can save optional link in diffrent path to douring the program.
+username="@@"	# default username, you don not have @@ as real username
+password="@@"	# default passowrd, you do not have @@ as real password
 proxy=""
-setTorrent="T_NULL"	# default initialization
-setYoutube="Y_NULL"	# default initialization
-#setFtp="F_NULL"
-#*************************************FINISH******************************************
+setTorrent="T_NULL"
+setYoutube="Y_NULL"
+#*********************************FINISH Initialization******************************
 
 #*************************************START******************************************
 function getLinks {
 	num=0
 	printf "Type the link: "
 		read link
+	link=$(echo "$link" | sed  's/ /\\ /g')
+	link="#$link#"		# fixed. we used '#' to determind the begin and end of the links. because may be the link contain space and program can not fetch links from file correctly.
+	
 	printf "Type path(The current directory is default): "
 		read path
 	if [[ $path == "" ]];then path=$crntDir ; fi
@@ -53,7 +59,7 @@ function getLinks {
 						read proxy
 				;;
 				3)
-					setTorrent="1t"	# i don't want to begin seed after download completed.
+					setTorrent="1t"
 				;;
 				4)
 					echo "We assume you have been filltering with your goverment and don't access to the some of sites like youtube."
@@ -64,7 +70,7 @@ function getLinks {
 					setYoutube="1y"
 				;;
 				5)
-					counter=$(cat $crntDir/links.txt 2>>$crntDir/error.txt | tail -1 | awk '{print $1}')		# fixed
+					counter=$(cat $crntDir/links.txt 2>>$crntDir/error.txt | tail -1 | awk '{print $1}')
 					((counter++))
 					echo "$counter $link $path" >> $crntDir/links.txt
 					if [[ ( $username -ne "@@" && $password -ne "@@" ) || $setTorrent -ne "T_NULL" ]];then
@@ -83,7 +89,7 @@ function getLinks {
 		printf "Link: "      ; echo $link
 		printf "username:\t" ; echo $username
 		printf "passowrd:\t" ; echo $password
-		printf "torrent:\t"  ; if [[ $setTorrent -eq 1 ]]; then echo "True"; else echo "False" ; fi
+		printf "torrent:\t"  ; if [[ "$setTorrent" == "1t" ]]; then echo "True"; else echo "False" ; fi
 		printf "proxy:\t"    ; echo $proxy
 		printf "*********************************************************\n"
 	done
@@ -93,7 +99,7 @@ function getLinks {
 
 #*************************************START******************************************
 #start program!
-if [[ $1 != "start" ]];then	# you can start downloading with give "start" arguman to execute program. like "./idm.sh start"
+if [[ $1 != "start" ]];then
 	
 	while true; do
 		ch=""
@@ -117,7 +123,6 @@ fi
 #*************************************FINISH*****************************************
 
 #*************************************START******************************************
-# check internet connection. if it was diactived, stop downloading while connection active.
 function checkNet {
 	stime=0
 	counter=1
@@ -126,15 +131,20 @@ function checkNet {
 			echo "$counter tries to connect to internet but failed" >> $crntDir/error.txt
 			if [[ $counter == 10 ]];then
 				echo "the connection is failed..." >> dllog
-				exit	# exit the program and stop downloads.
+				exit
 			fi
 			
 			let stime=$stime+30
-			$(nmcli nm wifi off)	# this may be different on your system
+			$(nmcli nm wifi off)
 			sleep $stime
-			$(nmcli nm wifi on)	# this may be different on your system
+			$(nmcli nm wifi on)
 			sleep 20
 		else
+			echo "************************************"
+			echo "**   The internet is connected    **"
+			echo "**     Enjoy of downloading...    **"
+			echo "************************************"
+			
 			return
 		fi
 		let counter=$counter+1
@@ -151,9 +161,8 @@ while read link; do
 	options=""
 	
 	counter=$(echo $link | awk '{print $1}')
-
-	path=$(echo $link | awk '{print $3}')	# get path of download
-	link=$(echo $link | awk '{print $2}')	# set link to be download
+	path=$(echo $link | cut -d# -f3)	# get path of download , fixed
+	link=$(echo $link | cut -d# -f2)	# set link to be download, fixed
 
 	info=$(cat $crntDir/req.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch requirment information like usernname,passowrd,... from req.txt
 	proxy=$(cat $crntDir/prx.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch proxy informations from prx.txt file.
@@ -163,25 +172,24 @@ while read link; do
 		password=$(echo $info | awk '{print $3}')
 		torrent=$(echo $info | awk '{print $4}')
 		youtube=$(echo $info | awk '{print $5}')
-	fi
+	fi	
 	
 	if [[ $username != "@@" && $passowrd != "@@" ]]; then	options="--http-user=$username  --http-passwd=$password" ; fi
 
 	if [[ $proxy != "" && $options -eq " " ]]; then	options="--all-proxy=$proxy"  ; fi
 
 	if [[ $torrent == "1t" ]]; then options="$options  --seed-time=0" ; fi
-
+		
 	if [[ $youtube == "1y" ]];then
 		# Download from youtube with youtube-dl. not used aria2c
-		echo "later..."
 	else
 		aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l dllog "${link}"
 	fi
 	
-	# delete link and it's options from files if download was successfull.
+	# delete link and it's options from files if download was successfully.
 	if [[ $? == 0 ]];then
 		sed -r -i "/^$counter/d" "$crntDir/links.txt" "$crntDir/req.txt"  "$crntDir/prx.txt"  2>>$crntDir/error.txt
 	fi
 	
-done < links.txt	# links.txt contains links that should be download.(main file)
+done < $crntDir/links.txt
 #*************************************FINISH*****************************************
