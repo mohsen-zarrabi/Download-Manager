@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This is an internet download manager that release with gnu public licence.
-# you can redistribute it for your self.
+# you can redistribute it for yourself.
 # Auther: M3
 
 #*********************************START Initialization*******************************
