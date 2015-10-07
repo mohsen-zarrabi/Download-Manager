@@ -7,15 +7,13 @@
 #*********************************START Initialization*******************************
 # Initialization
 
-crntDir="/home/mohsen/Downloads/down"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.
+crntDir="/home/mohsen/Downloads/down"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
 path=$crntDir	# default path to save downloads. you can save optional link in diffrent path to douring the program.
 username="@@"	# default username, you don not have @@ as real username
 password="@@"	# default passowrd, you do not have @@ as real password
 proxy=""
 setTorrent="T_NULL"
 setYoutube="Y_NULL"
-#setFtp="F_NULL"
-
 #*********************************FINISH Initialization******************************
 
 #*************************************START******************************************
@@ -23,14 +21,15 @@ function getLinks {
 	num=0
 	printf "Type the link: "
 		read link
+
 	link=$(echo "$link" | sed  's/ /\\ /g')
-	link="#$link#"		# fixed. we used '#' to determind the begin and end of the links. because may be the link contain space and program can not fetch links correctly from file.
+	link="#$link#"
 	
 	printf "Type path(The current directory is default): "
 		read path
 	if [[ $path == "" ]];then path=$crntDir ; fi
 	
-	while [[ $num -ne 6 ]]
+	while [[ $num -ne 6 ]]	# better use "do while" insted of "while do"
 	do
 		printf "options:\n"
 		printf "\t1- username and password (warnning: password will be save as clear text)\n"
@@ -76,7 +75,7 @@ function getLinks {
 					((counter++))
 					echo "$counter $link $path" >> $crntDir/links.txt
 					
-					if [[ ( $username -ne "@@" && $password -ne "@@" ) || $setTorrent -ne "T_NULL" ]];then
+					if [[ ( $username -ne "@@" && $password -ne "@@" ) || "$setTorrent" == "1t" ]];then
 						printf "$counter $username\t$password\t$setTorrent\t$setYoutube\n" >> $crntDir/req.txt
 					fi
 					
@@ -128,16 +127,16 @@ fi
 #*************************************FINISH*****************************************
 
 #*************************************START******************************************
-# check internet connection. if it was diactived, stop downloading while connection active.
 function checkNet {
 	stime=0
 	counter=1	# the number of attemps to connect to the internet. default is 10.
 	while true;do
 		if [[ `ping -c 4 8.8.8.8 &>/dev/null ; echo $?` != 0 ]];then
-			echo "$counter tries to connect to internet but failed" >> $crntDir/error.txt
+			#echo $counter
+			echo -e "$(date +%F"  "%T)\t#$counter tries to connect to internet but failed" >> $crntDir/error.txt
 			if [[ $counter == 10 ]];then
 				echo "the connection is failed..." >> dllog
-				exit
+				exit	# close the program
 			fi
 			
 			let stime=$stime+30
@@ -173,19 +172,19 @@ while read link; do
 	info=$(cat $crntDir/req.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch requirment information like usernname,passowrd,... from req.txt
 	proxy=$(cat $crntDir/prx.txt 2>>$crntDir/error.txt | grep -E "^$counter" | cut -d' ' -f2-) # fetch proxy informations from prx.txt file.
 	
-	if [[ $info != "" ]];then
-		username=$(echo $info | awk '{print $2}')
-		password=$(echo $info | awk '{print $3}')
-		torrent=$(echo $info | awk '{print $4}')
-		youtube=$(echo $info | awk '{print $5}')
+	if [[ "$info" != "" ]];then
+		username=$(echo $info | awk '{print $1}')
+		password=$(echo $info | awk '{print $2}')
+		torrent=$(echo $info | awk '{print $3}')
+		youtube=$(echo $info | awk '{print $4}')
 	fi
 	
 	# set require and optional options
-	if [[ $username != "@@" && $passowrd != "@@" ]]; then	options="--http-user=$username  --http-passwd=$password" ; fi
+	if [[ "$username" != "@@" && "$passowrd" != "@@" ]]; then	options="--http-user=$username  --http-passwd=$password" ; fi
 
-	if [[ $proxy != "" && $options -eq " " ]]; then	options="--all-proxy=$proxy"  ; fi
+	if [[ "$proxy" != "" && $options -eq " " ]]; then	options="--all-proxy=$proxy"  ; fi
 
-	if [[ $torrent == "1t" ]]; then options="$options  --seed-time=0" ; fi
+	if [[ "$torrent" == "1t" ]]; then options="$options  --seed-time=0" ; fi
 
 	cnt_down=0	# the number of attemps to download link
 	while [[ $cnt_down -ne 2 ]]
@@ -194,8 +193,11 @@ while read link; do
 		# Download from youtube with youtube-dl. not used aria2c
 		# we should be check that tor is run or not in this section. may be we need to change route with '-HUP' or another operations like reset tor and etc.
 			echo "youtube"
+		elif [[ "$torrent" == "1t" ]];then
+			# it's different. because we must set that where is the torrent file to download be successfull
+			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l "$crntDir/dllog" "$crntDir/${link}"		#&>/dev/null
 		else
-			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l dllog "${link}"
+			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l "$crntDir/dllog" "${link}"
 		fi
 		
 		# delete link and it's options from files if download was successfully.
