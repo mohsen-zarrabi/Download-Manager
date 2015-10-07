@@ -6,14 +6,14 @@
 
 #*********************************START Initialization*******************************
 # Initialization
-
-crntDir="/home/mohsen/Downloads/down"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
+crntDir="/path/to/download/files"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
 path=$crntDir	# default path to save downloads. you can save optional link in diffrent path to douring the program.
 username="@@"	# default username, you don not have @@ as real username
 password="@@"	# default passowrd, you do not have @@ as real password
 proxy=""
 setTorrent="T_NULL"
 setYoutube="Y_NULL"
+
 #*********************************FINISH Initialization******************************
 
 #*************************************START******************************************
@@ -22,14 +22,14 @@ function getLinks {
 	printf "Type the link: "
 		read link
 
-	link=$(echo "$link" | sed  's/ /\\ /g')
+	link=$(echo "$link" | sed  's/ /\\ /g')		# escape all of space in link
 	link="#$link#"
 	
 	printf "Type path(The current directory is default): "
 		read path
 	if [[ $path == "" ]];then path=$crntDir ; fi
 	
-	while [[ $num -ne 6 ]]	# better use "do while" insted of "while do"
+	while [[ $num -ne 6 ]]
 	do
 		printf "options:\n"
 		printf "\t1- username and password (warnning: password will be save as clear text)\n"
@@ -189,7 +189,7 @@ while read link; do
 	cnt_down=0	# the number of attemps to download link
 	while [[ $cnt_down -ne 2 ]]
 	do
-		if [[ $youtube == "1y" ]];then
+		if [[ "$youtube" == "1y" ]];then
 		# Download from youtube with youtube-dl. not used aria2c
 		# we should be check that tor is run or not in this section. may be we need to change route with '-HUP' or another operations like reset tor and etc.
 			echo "youtube"
