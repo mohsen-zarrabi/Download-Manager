@@ -195,7 +195,7 @@ while read link; do
 			echo "youtube"
 		elif [[ "$torrent" == "1t" ]];then
 			# it's different. because we must set that where is the torrent file to download be successfull
-			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l "$crntDir/dllog" "$crntDir/${link}"		#&>/dev/null
+			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l "$crntDir/dllog" "$crntDir/${link}"
 		else
 			aria2c -x16 -s16 -j1 -k 1M  $options -d "${path}" --log-level=notice -l "$crntDir/dllog" "${link}"
 		fi
