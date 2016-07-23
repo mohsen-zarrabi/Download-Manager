@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# This is an internet download manager that release with gnu public licence.
-# you can redistribute it for yourself.
 # Auther: M3
 
-#*********************************START Initialization*******************************
+#*********************************Start Initialization*******************************
 # Initialization
 crntDir="/path/to/download/files"	# save important files in this directory like links file, proxy file, etc. you can/should change it for yourself.	# fixed
 path=$crntDir	# default path to save downloads. you can save optional link in diffrent path to douring the program.
@@ -14,7 +12,7 @@ proxy=""
 setTorrent="T_NULL"
 setYoutube="Y_NULL"
 
-#*********************************FINISH Initialization******************************
+#*********************************Finish Initialization******************************
 
 #*************************************START******************************************
 function getLinks {
@@ -22,7 +20,7 @@ function getLinks {
 	printf "Type the link: "
 		read link
 
-	link=$(echo "$link" | sed  's/ /\\ /g')		# escape all of space in link
+	link=$(echo "$link" | sed  's/ /\\ /g')	 # escape all of space in link
 	link="#$link#"
 	
 	printf "Type path(The current directory is default): "
