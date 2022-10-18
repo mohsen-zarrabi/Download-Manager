@@ -3,10 +3,10 @@ This is an internet download manager that written with bash script and use aria2
 
 Depends:
 
-  1- aria2c --> sudo apt-get install aria2
+  1- aria2c --> sudo apt install aria2
 
-  2- nmcli  --> sudo apt-get install nmcli
+  2- nmcli  --> sudo apt install nmcli
 
-  3- tor    --> sudo apt-get install tor
+  3- tor & obfs4proxy    --> sudo apt install tor obfs4proxy
 
-  4- youtube-dl --> sudo apt-get install youtube-dl
+  4- youtube-dl --> sudo apt install youtube-dl
